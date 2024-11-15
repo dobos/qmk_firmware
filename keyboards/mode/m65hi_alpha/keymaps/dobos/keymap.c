@@ -16,69 +16,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
-
-enum {
-    TD_GRV_ESC = 0,
-};
-
-// Custom action to filter KC_GRV. Send an ESC when pressed as is and
-// KC_GRV when pressed in combination with KC_RALT. To achieve this,
-// we must also send key up events for KC_RALT.
-
-static bool custom_grv_pressed = FALSE;
+#include "dobos.h"
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case KC_ESC:
-            if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_RALT)) {
-                    // Send release codes for the modifier than a KC_GRV
-                    custom_grv_pressed = true;
-                    unregister_mods(MOD_BIT(KC_RALT));
-                    register_code(KC_GRV);
-                    register_mods(MOD_BIT(KC_RALT));
-
-                    // Do not send KC_ESC
-                    return false;
-                } else {
-                    // Pass through KC_ESC
-                    return true;
-                }
-            } else {
-                if (custom_grv_pressed) {
-                    // Modifier status?
-                    custom_grv_pressed = false;
-
-                    bool ralt_pressed = get_mods() & MOD_BIT(KC_RALT);
-
-                    if (ralt_pressed) {
-                        unregister_mods(MOD_BIT(KC_RALT));
-                    }
-
-                    unregister_code(KC_GRV);
-
-                    if (ralt_pressed) {
-                        register_mods(MOD_BIT(KC_RALT));
-                    }
-
-                    // Do not send KC_ESC release
-                    return false;
-                } else {
-                    // Pass through KC_ESC release
-                    return true;
-                }
-            }
-        default:
-            return true; // Process all other keycodes normally
-    }
+    return process_custom_grv(keycode, record);
 }
-
-// Custom tap dance for the escape key
-// Send KC_GRV when pressed once and KC_ESC when pressed twice quickly
-
-tap_dance_action_t tap_dance_actions[] = {
-    [TD_GRV_ESC] = ACTION_TAP_DANCE_DOUBLE(KC_GRV, KC_ESC)
-};
 
 // Layouts for each layer
 
