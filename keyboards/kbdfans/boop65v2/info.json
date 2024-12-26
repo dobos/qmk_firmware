@@ -1,0 +1,11 @@
+{
+    "manufacturer": "KBDFans",
+    "maintainer": "dobos",
+    "url": "",
+    "usb": {
+        "vid": "0x9D5B"
+    },
+    "build": {
+        "lto": true
+    }
+}
